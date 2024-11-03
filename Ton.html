@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Queue System</title>
+    <style>
+        /* Main container styling */
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+            color: #333;
+            text-align: center; /* Center text */
+        }
+
+        h1 {
+            color: #004085;
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+
+        /* Button styling */
+        button {
+            padding: 10px 20px;
+            font-size: 1em;
+            margin: 10px 0; /* Only vertical margin */
+            width: 200px;
+            cursor: pointer;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            box-shadow: 0 4px #999;
+            transition: box-shadow 0.3s, transform 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Different button colors */
+        button[data-room="1"] { background-color: #28a745; }
+        button[data-room="2"] { background-color: #007bff; }
+        button[data-room="3"] { background-color: #ffc107; color: black; }
+        button[data-room="4"] { background-color: #17a2b8; }
+        button.reset-button { background-color: #dc3545; }
+
+        /* Button press effect */
+        button:active {
+            box-shadow: 0 2px #666;
+            transform: translateY(2px);
+        }
+
+        /* Footer style */
+        footer {
+            color: #555;
+            margin-top: 20px; /* Spacing between buttons and footer */
+            font-size: 0.9em;
+            text-align: center; /* Center footer text */
+            padding: 20px 0; /* Add padding for spacing */
+        }
+
+        /* Popup table */
+        .popup-table {
+            width: 100%;
+            text-align: center;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .popup-table th {
+            border: 2px solid #004085;
+            padding: 10px;
+            font-size: 2em;
+            background-color: #007bff;
+            color: white;
+        }
+        .popup-table td {
+            border: 2px solid #004085;
+            padding: 25px;
+            font-size: 4em;
+            font-weight: bold;
+            color: #333;
+        }
+    </style>
+    <script>
+        let queueNumber = 1;
+        let popupWindow;
+
+        function openPopup() {
+            if (!popupWindow || popupWindow.closed) {
+                popupWindow = window.open("", "QueuePopup", "width=1920,height=1080");
+                popupWindow.document.write(`
+                    <html>
+                    <head><title>Queue Display</title><style>
+                        body { font-family: Arial, sans-serif; text-align: center; padding-top: 10px; }
+                        h2 { font-size: 1em; color: #004085; }
+                        .popup-table { width: 100%; text-align: center; border-collapse: collapse; }
+                        .popup-table th { border: 1px solid #004085; padding: 10px; font-size: 4em; background-color: #007bff; color: white; }
+                        .popup-table td { border: 1px solid #004085; padding: 1px; font-size: 8em; font-weight: bold; color: #333; }
+                    </style></head>
+                    <body>
+                        <h2>โรงพยาบาลสมเด็จพระเจ้าตากสินมหาราช : จัดทำโดย นวก.โสตฯ ศุภฤกษ์ เนตรแก้ว</h2>
+                        <table class="popup-table">
+                            <tr>
+                                <th>หมายเลข</th>
+                                <th>ห้องตรวจ</th>
+                            </tr>
+                            <tr id="row1">
+                                <td id="number1">000</td>
+                                <td id="room1">0</td>
+                            </tr>
+                            <tr id="row2">
+                                <td id="number2">000</td>
+                                <td id="room2">0</td>
+                            </tr>
+                            <tr id="row3">
+                                <td id="number3">000</td>
+                                <td id="room3">0</td>
+                            </tr>
+                        </table>
+                    </body>
+                    </html>
+                `);
+                popupWindow.document.close();
+            }
+        }
+
+        function callQueue(roomNumber) {
+            openPopup();
+
+            const rowId = `row${(queueNumber - 1) % 3 + 1}`;
+            const numberCell = popupWindow.document.getElementById(`number${(queueNumber - 1) % 3 + 1}`);
+            const roomCell = popupWindow.document.getElementById(`room${(queueNumber - 1) % 3 + 1}`);
+
+            numberCell.textContent = String(queueNumber).padStart(3, '0');
+            roomCell.textContent = roomNumber;
+
+            queueNumber++;
+        }
+
+        function resetQueue() {
+            if (popupWindow && !popupWindow.closed) {
+                for (let i = 1; i <= 3; i++) {
+                    popupWindow.document.getElementById(`number${i}`).textContent = '000';
+                    popupWindow.document.getElementById(`room${i}`).textContent = '0';
+                }
+            }
+            queueNumber = 1;
+        }
+
+        window.onload = openPopup;
+    </script>
+</head>
+<body>
+    <div>
+        <h1>ระบบเรียกคิว</h1>
+        <button data-room="1" onclick="callQueue(1)">🔔 เรียกคิวที่ห้องตรวจ 1</button>
+        <button data-room="2" onclick="callQueue(2)">🔔 เรียกคิวที่ห้องตรวจ 2</button>
+        <button data-room="3" onclick="callQueue(3)">🔔 เรียกคิวที่ห้องตรวจ 3</button>
+        <button data-room="4" onclick="callQueue(4)">🔔 เรียกคิวที่ห้องตรวจ 4</button>
+        <button class="reset-button" onclick="resetQueue()"> รีเซ็ตคิว</button>
+    </div>
+    <footer>
+        <p>จัดทำโดย นวก.โสตฯ ศุภฤกษ์ เนตรแก้ว<br>โรงพยาบาลสมเด็จพระเจ้าตากสินมหาราช</p>
+    </footer>
+</body>
+</html>
